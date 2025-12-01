@@ -1,0 +1,18 @@
+# Build trees (CMake). verify_local.py creates build-verify/.
+/build/
+/build-*/
+
+# Editor / OS noise
+*.o
+*.a
+.DS_Store
+compile_commands.json
+
+# Backup and scratch files — never committed
+*.orig
+*.bak
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
