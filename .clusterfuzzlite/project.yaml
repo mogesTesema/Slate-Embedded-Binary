@@ -1,0 +1,9 @@
+language: c++
+# Address sanitizer only. The engine's bugs are memory-safety faults; building a
+# single sanitizer keeps incidental undefined behavior from masking them.
+sanitizers:
+  - address
+fuzz_targets:
+  - workbook_parse_fuzzer
+  - recalc_fuzzer
+  - formula_fuzzer
