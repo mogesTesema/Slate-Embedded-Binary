@@ -3,7 +3,7 @@
 
 namespace slate {
 
-void Teardown::release_spill_blocks(std::deque<SpillRecord>& spills) {
+void Teardown::release_spill_blocks(std::vector<SpillRecord>& spills) {
   // Release spill-array blocks. Check the released flag to avoid redundant
   // releases.
   for (SpillRecord& rec : spills) {
@@ -36,7 +36,7 @@ void Teardown::release_name_borrows() {
     if (n.name != kNoStr) strings_.release(n.name);
 }
 
-std::uint32_t Teardown::run(std::deque<SpillRecord>& spills) {
+std::uint32_t Teardown::run(std::vector<SpillRecord>& spills) {
   release_spill_blocks(spills);
   release_cell_handles();
   release_name_borrows();

@@ -39,10 +39,10 @@ class Teardown {
       : wb_(wb), strings_(strings), arrays_(arrays), epoch_(epoch) {}
 
   // Run the ordered drain. Returns the number of SST pages recycled.
-  std::uint32_t run(std::deque<SpillRecord>& spills);
+  std::uint32_t run(std::vector<SpillRecord>& spills);
 
  private:
-  void release_spill_blocks(std::deque<SpillRecord>& spills);
+  void release_spill_blocks(std::vector<SpillRecord>& spills);
   void release_cell_handles();
   void release_name_borrows();
 

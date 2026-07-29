@@ -89,16 +89,12 @@ class RecalcDriver {
   TopoOrder topo_;
 
   std::vector<Program> programs_;         // indexed by FormulaId
-  std::deque<SpillRecord> spill_records_; // one per active anchor; deque for pointer stability
-  std::vector<std::size_t> pending_conflicts_; // indices into spill_records_ needing deferred resolution
+  std::vector<SpillRecord> spill_records_; // one per active anchor
+  std::vector<SpillRecord*> pending_conflicts_; // pointers needing deferred resolution
   std::vector<CellId> spill_cells_;        // materialized target cells
   RecalcStats stats_;
   RecalcSummary summary_;
   PreviewTracker preview_;
-  std::uint32_t summary_text_handle_ = 0;
-  bool has_summary_text_borrow_ = false;
-  std::uint32_t summary_array_handle_ = 0;
-  bool has_summary_array_borrow_ = false;
 };
 
 }  // namespace slate

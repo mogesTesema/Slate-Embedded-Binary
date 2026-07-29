@@ -119,8 +119,8 @@ void RecalcDriver::evaluate_anchor(CellId id, DiagnosticSink& diag) {
   // The array result carries one owned reference; transfer it to a spill record
   // (the sole owner) and expose a non-owning view in the anchor cell.
   std::uint32_t handle = result.as_array();
-  std::size_t rec_index = spill_records_.size();
   spill_records_.push_back(SpillRecord{id, handle, false});
+  SpillRecord* rec_ptr = &spill_records_.back();
 
   // First-come-wins: if any target is already occupied by another spill, this
   // anchor cannot spill — demote it and give the block back.
@@ -140,7 +140,8 @@ void RecalcDriver::evaluate_anchor(CellId id, DiagnosticSink& diag) {
   ++stats_.evaluated;
 
   if (conflict) {
-    pending_conflicts_.push_back(rec_index);
+    pending_conflicts_.push_back(rec_ptr);
+    preview_.note_spill_record(rec_ptr);
   } else {
     ++stats_.spills;
     materialize_spill(id, handle, sp);
@@ -148,8 +149,8 @@ void RecalcDriver::evaluate_anchor(CellId id, DiagnosticSink& diag) {
 }
 
 void RecalcDriver::resolve_pending_conflicts() {
-  for (std::size_t rec_index : pending_conflicts_) {
-    SpillRecord& rec = spill_records_[rec_index];
+  for (SpillRecord* rec_ptr : pending_conflicts_) {
+    SpillRecord& rec = *rec_ptr;
     if (!rec.released) {
       arrays_.release(rec.array);
       rec.released = true;
@@ -223,32 +224,17 @@ void RecalcDriver::teardown() {
 }
 
 void RecalcDriver::note_summary_text(std::uint32_t handle) {
-  if (!has_summary_text_borrow_ || handle != summary_text_handle_) {
-    if (has_summary_text_borrow_) strings_.release(summary_text_handle_);
-    strings_.retain(handle);
-    summary_text_handle_ = handle;
-    has_summary_text_borrow_ = true;
-  }
+  summary_.note_text(strings_.resolve(handle));
 }
 
 void RecalcDriver::note_summary_array(std::uint32_t handle) {
-  if (!has_summary_array_borrow_ || handle != summary_array_handle_) {
-    if (has_summary_array_borrow_) arrays_.release(summary_array_handle_);
-    arrays_.retain(handle);
-    summary_array_handle_ = handle;
-    has_summary_array_borrow_ = true;
+  const ArrayValue* a = arrays_.get(handle);
+  if (a && !a->cells.empty()) {
+    summary_.note_array(&a->cells[0]);
   }
 }
 
 void RecalcDriver::release_summary() {
-  if (has_summary_text_borrow_) {
-    strings_.release(summary_text_handle_);
-    has_summary_text_borrow_ = false;
-  }
-  if (has_summary_array_borrow_) {
-    arrays_.release(summary_array_handle_);
-    has_summary_array_borrow_ = false;
-  }
 }
 
 Status RecalcDriver::run(DiagnosticSink& diag) {
@@ -265,6 +251,10 @@ Status RecalcDriver::run(DiagnosticSink& diag) {
   if (preview_.array_cell()) {
     stats_.last_array_preview = *preview_.array_cell();
     stats_.has_array_preview = true;
+  }
+  if (preview_.spill_record()) {
+    volatile bool b = preview_.spill_record()->released;
+    (void)b;
   }
   preview_.release_borrows();
   return Status::ok;

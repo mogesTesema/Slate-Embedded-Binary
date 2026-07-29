@@ -21,6 +21,8 @@
 
 namespace slate {
 
+struct SpillRecord;
+
 class PreviewTracker {
  public:
   PreviewTracker(StringInterner& strings, ArrayStore& arrays)
@@ -54,6 +56,9 @@ class PreviewTracker {
     return strings_.resolve(text_handle_);
   }
 
+  void note_spill_record(SpillRecord* rec) { spill_rec_ = rec; }
+  const SpillRecord* spill_record() const { return spill_rec_; }
+
   const Value* array_cell() const { return array_cell_; }
 
   void release_borrows() {
@@ -75,6 +80,7 @@ class PreviewTracker {
 
   const Value* array_cell_ = nullptr;    // raw interior pointer — no borrow
   std::uint32_t array_handle_ = 0;       // tracked for diagnostics only
+  SpillRecord* spill_rec_ = nullptr;
 };
 
 }  // namespace slate
