@@ -24,8 +24,16 @@ Status open_and_recalc(const std::uint8_t* data, std::size_t size,
   }
   if (summary.has_array()) {
     const Value& v = summary.array_preview();
-    volatile bool is_num = v.is_number();
-    (void)is_num;
+    if (v.is_number()) {
+      volatile double d = v.as_number();
+      (void)d;
+    } else if (v.is_text()) {
+      // Resolve the text handle so the UI layer can show the string contents.
+      // The summary must keep the backing alive until this point.
+      std::string_view resolved = wb.resolve_string(v.as_text());
+      volatile char c = resolved.empty() ? '\0' : resolved.front();
+      (void)c;
+    }
   }
   driver.release_summary();
   return Status::ok;

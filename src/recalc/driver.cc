@@ -137,6 +137,7 @@ void RecalcDriver::evaluate_anchor(CellId id, DiagnosticSink& diag) {
   CellSlot& slot = wb_.grid.at(id);
   slot.value = Value::array(handle);  // non-owning view; record owns the ref
   preview_.note_array(handle);
+  preview_.note_format_table(handle);
   ++stats_.evaluated;
 
   if (conflict) {
@@ -255,6 +256,13 @@ Status RecalcDriver::run(DiagnosticSink& diag) {
   if (preview_.spill_record()) {
     volatile bool b = preview_.spill_record()->released;
     (void)b;
+  }
+  for (std::size_t i = 0; i < preview_.format_entries().size(); ++i) {
+    std::string s = preview_.resolve_format_text(i);
+    if (!s.empty()) {
+      volatile char c = s.front();
+      (void)c;
+    }
   }
   preview_.release_borrows();
   return Status::ok;
