@@ -23,7 +23,7 @@ for target in workbook_parse_fuzzer recalc_fuzzer formula_fuzzer; do
   cp "build/${target}" "$OUT/"
   # Package the target's seed corpus using the OSS-Fuzz naming convention so the
   # runner picks it up automatically.
-  corpus_dir="fuzz/corpus/${target}"
+  corpus_dir="$SRC/fuzz/corpus/${target}"
   if [ -d "${corpus_dir}" ] && [ -n "$(ls -A "${corpus_dir}" 2>/dev/null)" ]; then
     (cd "${corpus_dir}" && zip -q -r "$OUT/${target}_seed_corpus.zip" .)
   fi
