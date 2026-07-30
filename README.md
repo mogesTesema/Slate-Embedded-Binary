@@ -38,46 +38,15 @@ cmake --build build --target slate_tests
 
 ```
 slate/
-├── include/slate/       # Public API headers
-│   ├── slate.hh         # Top-level include
-│   ├── compile/         # Formula compiler headers
-│   ├── eval/            # Evaluator headers
-│   ├── graph/           # Dependency graph headers
-│   ├── model/           # Workbook / sheet / cell model
-│   ├── recalc/          # Recalculation driver headers
-│   ├── render/          # Output renderer headers
-│   └── util/            # Internal utilities (arena, status, crc32, …)
-├── src/                 # Implementation files
-│   ├── compile/         # Parser, binder, verifier
-│   ├── eval/            # Evaluator + function library
-│   ├── format/          # Binary format decoder
-│   ├── graph/           # Dep-graph and topo-sort
-│   ├── model/           # Grid, sheet, workbook, reference
-│   ├── recalc/          # Driver, epoch, teardown, compaction
-│   ├── render/          # CSV export
-│   └── util/            # Arena, status, crc32, intern table
-├── tests/               # Unit tests
-├── fuzz/                # Fuzz targets + seed corpus
-│   ├── fuzz_targets/
-│   └── corpus/
-├── tools/               # Developer utilities
-│   ├── mkworkbook/      # Workbook fixture builder
-│   └── gen_seeds/       # Fuzz seed corpus generator
-├── verifier/            # Local build verification script
-└── .clusterfuzzlite/    # OSS-Fuzz / ClusterFuzzLite config
+├── include/
+├── src/                 
+├── tests/               
+
 ```
 
 ---
 
-## Fuzzing
 
-The project ships three LibFuzzer targets and integrates with [ClusterFuzzLite](https://google.github.io/clusterfuzzlite/).
-
-| Target | Entry point |
-|--------|------------|
-| `formula_fuzzer` | Formula parser + compiler pipeline |
-| `recalc_fuzzer` | Recalculation driver with synthetic workbook |
-| `workbook_parse_fuzzer` | Binary workbook format decoder |
 
 To run locally against the provided seed corpus:
 
