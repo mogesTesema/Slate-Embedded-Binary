@@ -10,7 +10,7 @@
 # only the language standard.
 export CXXFLAGS="${CXXFLAGS:-} -std=c++20"
 
-cd "$SRC/slate"
+cd "$SRC"
 
 cmake -S . -B build \
   -DCMAKE_BUILD_TYPE=RelWithDebInfo \
